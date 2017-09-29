@@ -1,6 +1,9 @@
+require "pry"
+
 class Field
   @@fields = []
   @@harvested = 0
+
   def initialize
 
   end
@@ -36,7 +39,7 @@ class Field
       end
       puts "Added a #{user_crop} field of #{user_area} hectares!"
     when "harvest" then Field.harvest_all
-    when "status" then status
+    when "status" then Field.status
     when "relax" then relax
     when "exit" then abort
     end
@@ -52,7 +55,7 @@ class Field
     @@fields << new_wheat
   end
 
-  def status
+  def self.status
     puts "The farm has harvested #{@@harvested} food so far."
   end
 
@@ -72,19 +75,19 @@ class Field
     @@fields.each do |field|
       if field.class == Corn
         puts "Harvesting #{field.corn} food from #{field.area} hectare corn field."
+        @@harvested += field.crop_harvest
       elsif field.class == Wheat
         puts "Harvesting #{field.wheat} food from #{field.area} hectare wheat field."
+        @@harvested += field.crop_harvest
       end
     end
-    @@harvested += Corn.harvest
-    @@harvested += Wheat.harvest
-    self.status
+    status
   end
 end
 
 class Corn < Field
-  @@corn = 0
   @@planted_area = 0
+
   def initialize(area)
     @area = area
     @corn = 20 * area
@@ -103,16 +106,16 @@ class Corn < Field
     @@planted_area
   end
 
-  def self.harvest
-    @@corn.each { |crop| @@corn += crop.corn }
+  def crop_harvest
     @@planted_area = 0
-    @@corn
+    return @corn
   end
 end
 
 class Wheat < Field
   @@wheat = 0
   @@planted_area = 0
+
   def initialize(area)
     @area = area
     @wheat = 30 * area
@@ -131,10 +134,9 @@ class Wheat < Field
     @area
   end
 
-  def self.harvest
-    @@wheat.each { |crop| @@wheat += crop.wheat }
+  def crop_harvest
     @@planted_area = 0
-    @@wheat
+    return @wheat
   end
 end
 
